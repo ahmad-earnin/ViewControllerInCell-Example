@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ColorTableViewCell: UITableViewCell {
+class ColorTableViewCell: UICollectionViewCell {
 
     static let reuseIdentifier = "ColorTableViewCellIdentifier"
     
@@ -19,7 +19,7 @@ class ColorTableViewCell: UITableViewCell {
             guard let hostedView = hostedView else {
                 return
             }
-            
+            print("ADDING")
             hostedView.frame = contentView.bounds
             contentView.addSubview(hostedView)
         }
@@ -29,8 +29,9 @@ class ColorTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        
+        print("REUSING")
         if hostedView?.superview == contentView { //Make sure that hostedView hasn't been added as a subview to a different cell
+            print("REMOVED")
             hostedView?.removeFromSuperview()
         } else {
             print("hostedView is no longer attached to this cell")

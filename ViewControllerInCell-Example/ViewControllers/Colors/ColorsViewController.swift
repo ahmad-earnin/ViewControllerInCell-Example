@@ -10,8 +10,8 @@ import UIKit
 
 class ColorsViewController: UIViewController {
     
-    @IBOutlet weak var tableView: UITableView!
-    
+    @IBOutlet var tableView: UICollectionView!
+
     lazy var colorViewControllers: [ColorViewController] = {
         var colorViewControllers = [ColorViewController]()
         
@@ -29,8 +29,21 @@ class ColorsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tableView.rowHeight = 88
+
+        tableView.dataSource = self
+        tableView.collectionViewLayout = {
+            let layout = UICollectionViewFlowLayout()
+            layout.estimatedItemSize = CGSize(width: view.bounds.width, height: 80)
+            return layout
+        }()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.tableView.performBatchUpdates({ }, completion: { _ in })
+        }
     }
     
     // MARK: - ChildViewControllers
@@ -41,21 +54,19 @@ class ColorsViewController: UIViewController {
     }
 }
 
-extension ColorsViewController: UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return colorViewControllers.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+extension ColorsViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let colorViewController = colorViewControllers[indexPath.row]
-        
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: ColorTableViewCell.reuseIdentifier, for: indexPath) as? ColorTableViewCell else {
+
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorTableViewCell.reuseIdentifier, for: indexPath) as? ColorTableViewCell else {
             fatalError("Unexpected cell being dequeued")
         }
-        
+
         cell.hostedView = colorViewController.view
-        
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return colorViewControllers.count
     }
 }
